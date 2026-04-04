@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Idiomixer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --parchment: #f5f0e8;
+      --parchment-deep: #e5ddd0;
+      --accent: #c2703e;
+      --accent-hover: #d4823f;
+      --success: #2d8a5e;
+      --present: #c9a227;
+      --error: #d44040;
+      --muted: #8a8279;
+      --clue-locked: #ddd8cf;
+      --clue-active: #fffaf3;
+      --shadow: rgba(26,26,26,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--parchment);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* === TOP === */
+    #top {
+      flex-shrink: 0;
+      padding: 8px 16px 4px;
+      text-align: center;
+      border-bottom: 1px solid var(--parchment-deep);
+    }
+    #top .tagline {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      margin: 1px 0 6px;
+    }
+    .idiom-card {
+      background: var(--clue-active);
+      border: 1.5px solid var(--parchment-deep);
+      border-radius: 10px;
+      padding: 7px 14px;
+      max-width: 340px;
+      margin: 0 auto;
+      box-shadow: 0 1px 6px var(--shadow);
+    }
+    .lang-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(194,112,62,0.1);
+      padding: 1px 8px;
+      border-radius: 100px;
+      margin-bottom: 3px;
+    }
+    .foreign-text {
+      font-size: 15px;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.3;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .hint-btn {
+      margin-top: 4px;
+      background: white;
+      border: 1.5px solid var(--parchment-deep);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 2px 10px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .hint-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .hint-text {
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+    }
+
+    /* === MIDDLE === */
+    #middle {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4px 12px;
+      gap: 3px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .guess-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .word-row {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      background: white;
+      border: 2px solid var(--parchment-deep);
+      border-radius: 6px;
+      color: var(--ink);
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .tile.active { background: #fffcf7; border-color: rgba(194,112,62,0.4); }
+    .tile.active.filled { background: #fffaf3; border-color: var(--accent); box-shadow: 0 1px 4px var(--shadow); }
+    .tile.locked, .tile.correct { background: var(--success); border-color: var(--success); color: #fff; }
+    .tile.present { background: var(--present); border-color: var(--present); color: #fff; }
+    .tile.absent { background: var(--clue-locked); border-color: var(--parchment-deep); color: var(--muted); }
+
+    /* Game over */
+    .game-over {
+      text-align: center;
+      padding: 16px 20px;
+      background: white;
+      border: 1.5px solid var(--parchment-deep);
+      border-radius: 12px;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 2px 12px var(--shadow);
+      animation: fadeIn 0.5s ease;
+    }
+    .game-over h2 {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Cormorant Garamond', serif;
+      margin-bottom: 4px;
+    }
+    .game-over h2.win { color: var(--success); }
+    .game-over h2.lose { color: var(--error); }
+    .game-over .answer-text { font-size: 12px; color: var(--muted); margin-bottom: 6px; word-break: break-word; }
+    .game-over .answer-text strong { color: var(--ink); font-weight: 700; }
+    .story-btn {
+      margin-top: 4px; padding: 8px 18px;
+      background: rgba(194,112,62,0.08);
+      border: 1.5px solid var(--accent); border-radius: 8px;
+      color: var(--accent); font-size: 11px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+    }
+    .story-btn:hover { background: rgba(194,112,62,0.15); }
+    .story-box {
+      margin-top: 8px; padding: 12px;
+      background: rgba(194,112,62,0.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-size: 13px; line-height: 1.6;
+      color: var(--ink); text-align: left;
+      font-family: 'Cormorant Garamond', serif;
+      max-height: 120px; overflow-y: auto;
+      animation: fadeIn 0.3s ease;
+    }
+    .play-again-btn {
+      margin-top: 10px; padding: 8px 22px;
+      background: var(--accent); border: none; border-radius: 8px;
+      color: #fff; font-size: 12px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+    }
+    .play-again-btn:hover { background: var(--accent-hover); }
+
+    /* === BOTTOM: Keyboard === */
+    #bottom {
+      flex-shrink: 0;
+      padding: 4px 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      align-items: center;
+      border-top: 1px solid var(--parchment-deep);
+      background: var(--parchment);
+      z-index: 2;
+    }
+    .kb-row { display: flex; gap: 3px; justify-content: center; }
+    .kb-key {
+      width: 28px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      background: white;
+      border: 1.5px solid var(--parchment-deep);
+      border-radius: 6px; color: var(--ink); cursor: pointer;
+      user-select: none; padding: 0;
+      box-shadow: 0 1px 2px var(--shadow);
+      transition: all 0.15s;
+    }
+    .kb-key:hover { filter: brightness(1.05); }
+    .kb-key.wide { width: 46px; font-size: 9px; font-weight: 600; }
+    .kb-key.correct { background: var(--success); border-color: var(--success); color: #fff; }
+    .kb-key.present { background: var(--present); border-color: var(--present); color: #fff; }
+    .kb-key.absent { background: var(--clue-locked); border-color: var(--clue-locked); color: var(--muted); }
+    .history-toggle {
+      margin-top: 1px; background: none; border: none;
+      color: var(--accent); font-size: 10px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.03em; padding: 2px 8px;
+    }
+
+    /* Overlay */
+    .overlay-bg {
+      position: fixed; inset: 0;
+      background: rgba(26,26,26,0.3); z-index: 8;
+      display: none;
+    }
+    .overlay-bg.show { display: block; }
+    .history-panel {
+      position: fixed; bottom: 130px; left: 8px; right: 8px;
+      background: var(--parchment);
+      border: 1.5px solid var(--parchment-deep);
+      border-radius: 12px;
+      padding: 12px 14px 14px;
+      max-height: 45vh; overflow-y: auto;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      gap: 8px; align-items: center;
+      box-shadow: 0 4px 20px rgba(26,26,26,0.15);
+      animation: fadeIn 0.15s ease;
+    }
+    .history-panel.show { display: flex; }
+    .history-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .history-guess { display: flex; flex-direction: column; gap: 2px; align-items: center; }
+    .history-guess .num { font-size: 9px; color: var(--muted); font-weight: 600; margin-bottom: 1px; }
+    .history-word-row { display: flex; gap: 2px; justify-content: center; }
+    .htile {
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-family: 'DM Sans', sans-serif;
+      background: white; border: 1.5px solid var(--parchment-deep);
+      border-radius: 3px; color: var(--ink); flex-shrink: 0;
+    }
+    .htile.correct { background: var(--success); border-color: var(--success); color: #fff; }
+    .htile.present { background: var(--present); border-color: var(--present); color: #fff; }
+    .htile.absent { background: var(--clue-locked); border-color: var(--parchment-deep); color: var(--muted); }
+
+    .shake { animation: shake 0.5s ease; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--parchment-deep); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP -->
+  <div id="top">
+    <svg viewBox="0 0 260 50" width="220" height="42" style="display:block;margin:0 auto;">
+      <defs>
+        <linearGradient id="jarGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d4823f"/>
+          <stop offset="100%" stop-color="#c2703e"/>
+        </linearGradient>
+      </defs>
+      <path d="M10 14 L18 14 L20 40 L8 40 Z" fill="none" stroke="#c2703e" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M9.5 28 L18.5 28 L19.5 38 L8.5 38 Z" fill="rgba(194,112,62,0.15)"/>
+      <path d="M10 32 Q14 28 18 32" fill="none" stroke="#c2703e" stroke-width="0.8" opacity="0.5"/>
+      <rect x="9" y="11" width="10" height="3" rx="1.5" fill="#c2703e" opacity="0.8"/>
+      <path d="M20 20 Q24 20 24 24 Q24 28 20 28" fill="none" stroke="#c2703e" stroke-width="1.5" opacity="0.6"/>
+      <circle cx="7" cy="7" r="3" fill="none" stroke="#c2703e" stroke-width="0.8" opacity="0.5"/>
+      <text x="7" y="9" font-size="4" fill="#c2703e" font-family="'Cormorant Garamond', serif" text-anchor="middle" font-weight="700" opacity="0.6">A</text>
+      <circle cx="19" cy="5" r="2.5" fill="none" stroke="#c2703e" stroke-width="0.8" opacity="0.5"/>
+      <text x="19" y="7" font-size="3.5" fill="#c2703e" font-family="'Cormorant Garamond', serif" text-anchor="middle" font-weight="700" opacity="0.6">漢</text>
+      <circle cx="13" cy="3" r="2.8" fill="none" stroke="#c2703e" stroke-width="0.8" opacity="0.5"/>
+      <text x="13" y="5.2" font-size="3.5" fill="#c2703e" font-family="'Cormorant Garamond', serif" text-anchor="middle" font-weight="700" opacity="0.6">ñ</text>
+      <rect x="6" y="40" width="16" height="3" rx="1.5" fill="#c2703e" opacity="0.4"/>
+      <text x="34" y="22" font-size="26" font-weight="700" font-family="'Cormorant Garamond', Georgia, serif" letter-spacing="1" fill="#1a1a1a">
+        Idio<tspan fill="#c2703e">mixer</tspan>
+      </text>
+    </svg>
+    <div class="tagline">Don't waste your time on idiots, waste it on idioms.</div>
+    <div class="idiom-card">
+      <div class="lang-badge" id="langBadge"></div>
+      <div class="foreign-text" id="foreignText"></div>
+      <div id="hintArea"></div>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div id="middle"></div>
+
+  <!-- BOTTOM -->
+  <div id="bottom"></div>
+
+  <!-- Overlay -->
+  <div class="overlay-bg" id="overlayBg"></div>
+  <div class="history-panel" id="historyPanel"></div>
+
+<script>
+const IDIOMS = [
+  { foreign:"Mi casa es su casa", language:"Spanish", literal:"My house is your house", answer:"MAKE YOURSELF AT HOME", story:"The Spanish phrase reflects the deep tradition of hospitality in Hispanic cultures, where guests are treated like family. The English equivalent 'make yourself at home' similarly invites comfort and ease, though perhaps with a touch less grandeur \u2014 one phrase offers you the whole house, the other just suggests you act like you own it." },
+  { foreign:"Il pleut des cordes", language:"French", literal:"It's raining ropes", answer:"IT IS RAINING CATS AND DOGS", story:"The French imagine heavy rain as thick ropes falling from the sky \u2014 a vivid picture of sheets of water. The English version is even more absurd: 'raining cats and dogs' likely dates to 17th-century London, where heavy storms could wash street debris (sadly, sometimes including dead animals) through the gutters. Both idioms capture that dramatic, torrential downpour." },
+  { foreign:"Tomaten auf den Augen haben", language:"German", literal:"To have tomatoes on your eyes", answer:"TURN A BLIND EYE", story:"Germans picture willful ignorance as having juicy red tomatoes plastered over your eyes \u2014 a wonderfully absurd image. The English 'turn a blind eye' has a more dignified origin: Admiral Nelson allegedly held his telescope to his blind eye at the Battle of Copenhagen to avoid seeing the signal to retreat. Both mean choosing not to see what's plainly there." },
+  { foreign:"Co\u00fbter les yeux de la t\u00eate", language:"French", literal:"To cost the eyes from your head", answer:"IT COSTS AN ARM AND A LEG", story:"The French think something outrageously expensive costs your very eyesight \u2014 your window to the world. English speakers up the ante with an arm AND a leg. The English phrase became popular after World War II, possibly referencing the terrible price soldiers paid. Both idioms agree: some things cost far more than money." },
+  { foreign:"Dar en el clavo", language:"Spanish", literal:"To hit the nail", answer:"HIT THE NAIL ON THE HEAD", story:"The Spanish keep it short and sweet \u2014 just hit the nail. English speakers need to be more specific: you must hit it on the head. Both come from the satisfying precision of carpentry. When you drive a nail perfectly with one clean strike, you've gotten something exactly right. No second swings needed." },
+  { foreign:"Die Daumen dr\u00fccken", language:"German", literal:"To press the thumbs", answer:"KEEP YOUR FINGERS CROSSED", story:"In Germany, you squeeze your thumbs inside your fists for luck \u2014 a gesture dating back to Roman gladiatorial combat, where spectators would tuck their thumbs to wish a fighter well. English speakers cross their fingers instead, a gesture with Christian origins representing the sign of the cross. Different digits, same desperate hope." },
+  { foreign:"Avoir le cafard", language:"French", literal:"To have the cockroach", answer:"FEELING DOWN IN THE DUMPS", story:"Leave it to the French to describe sadness as having a cockroach \u2014 that persistent, unwelcome creature scuttling around inside you. Charles Baudelaire popularised this usage in his poetry. The English 'down in the dumps' is less creepy but equally evocative, with 'dumps' likely from the Dutch 'damp' meaning haze or mist \u2014 a fog of melancholy." },
+  { foreign:"In bocca al lupo", language:"Italian", literal:"Into the mouth of the wolf", answer:"BREAK A LEG", story:"Italians wish you luck by throwing you into a wolf's jaws \u2014 the correct response is 'Crepi il lupo!' (May the wolf die!). English theatre folk tell performers to 'break a leg,' possibly because wishing good luck was considered bad luck, or from the old meaning of 'break' as 'to bend' \u2014 taking a bow. Both traditions agree: the best wishes come in dark disguises." }
+];
+
+const KB_ROWS = [
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","\u232b"]
+];
+const MAX = 6;
+
+let idiom, answerWords, guesses, grid, locked, activeWord, gameState, keyColors, showHist;
+
+function init() {
+  idiom = IDIOMS[Math.floor(Math.random() * IDIOMS.length)];
+  answerWords = idiom.answer.split(" ");
+  guesses = [];
+  locked = answerWords.map(w => new Array(w.length).fill(null));
+  grid = makeGrid();
+  activeWord = 0;
+  gameState = "playing";
+  keyColors = {};
+  showHist = false;
+  renderTop();
+  renderMiddle();
+  renderBottom();
+  document.getElementById('overlayBg').className = 'overlay-bg';
+  document.getElementById('historyPanel').className = 'history-panel';
+}
+
+function makeGrid() {
+  return answerWords.map((w, wi) => w.split("").map((_, li) => locked[wi][li] || ""));
+}
+
+function rebuildLocked() {
+  locked = answerWords.map(w => new Array(w.length).fill(null));
+  for (const g of guesses) {
+    for (let w = 0; w < answerWords.length; w++) {
+      for (let i = 0; i < answerWords[w].length; i++) {
+        if (g.evaluation[w]?.[i] === "correct") locked[w][i] = g.words[w][i];
+      }
+    }
+  }
+}
+
+function evaluate(guessWords) {
+  const result = [];
+  for (let w = 0; w < answerWords.length; w++) {
+    const gW = (guessWords[w]||"").toUpperCase(), aW = answerWords[w];
+    const wr = [], used = new Array(aW.length).fill(false);
+    for (let i = 0; i < aW.length; i++) {
+      if (gW[i] === aW[i]) { wr[i] = "correct"; used[i] = true; } else wr[i] = "absent";
+    }
+    for (let i = 0; i < aW.length; i++) {
+      if (wr[i] === "correct") continue;
+      for (let j = 0; j < aW.length; j++) {
+        if (!used[j] && gW[i] === aW[j]) { wr[i] = "present"; used[j] = true; break; }
+      }
+    }
+    result.push(wr);
+  }
+  return result;
+}
+
+function cursor(wIdx) {
+  for (let i = 0; i < grid[wIdx].length; i++) {
+    if (!locked[wIdx][i] && !grid[wIdx][i]) return i;
+  }
+  return -1;
+}
+
+function firstEditable() {
+  for (let w = 0; w < locked.length; w++) { if (locked[w].some(l => !l)) return w; }
+  return 0;
+}
+
+function tileSize(wordLen) { return Math.max(26, Math.min(36, Math.floor(300 / wordLen))); }
+function histTileSize(wordLen) { return Math.max(16, Math.min(22, Math.floor(240 / wordLen))); }
+
+// ---- Render ----
+function renderTop() {
+  document.getElementById('langBadge').textContent = idiom.language;
+  document.getElementById('foreignText').innerHTML = '\u201c' + idiom.foreign + '\u201d';
+  document.getElementById('hintArea').innerHTML = '<button class="hint-btn" onclick="showHint()">Show Hint</button>';
+}
+
+function showHint() {
+  document.getElementById('hintArea').innerHTML = '<div class="hint-text">Literally: \u201c' + idiom.literal + '\u201d</div>';
+}
+
+function renderMiddle() {
+  const mid = document.getElementById('middle');
+  if (gameState === "playing") {
+    let h = '<div class="guess-label">Guess ' + (guesses.length + 1) + ' of ' + MAX + '</div>';
+    answerWords.forEach((word, wIdx) => {
+      const sz = tileSize(word.length);
+      const fs = sz < 30 ? 10 : 13;
+      h += '<div class="word-row" onclick="setActive(' + wIdx + ')">';
+      word.split("").forEach((_, lIdx) => {
+        const letter = grid[wIdx]?.[lIdx] || "";
+        const isLock = !!locked[wIdx][lIdx];
+        const isAct = wIdx === activeWord;
+        let cls = "tile";
+        if (isLock) cls += " locked";
+        else if (isAct && letter) cls += " active filled";
+        else if (isAct) cls += " active";
+        h += '<div class="' + cls + '" style="width:' + sz + 'px;height:' + sz + 'px;font-size:' + fs + 'px">' + letter + '</div>';
+      });
+      h += '</div>';
+    });
+    mid.innerHTML = h;
+  } else {
+    let h = '<div class="game-over">';
+    if (gameState === "won") {
+      h += '<h2 class="win">Brilliant! ' + guesses.length + '/' + MAX + '</h2>';
+    } else {
+      h += '<h2 class="lose">Not quite!</h2>';
+      h += '<div class="answer-text">The answer was <strong>' + idiom.answer + '</strong></div>';
+    }
+    h += '<button class="story-btn" id="storyBtn" onclick="showStory()">The story behind both idioms</button>';
+    h += '<div id="storyBox"></div>';
+    h += '<button class="play-again-btn" onclick="init()">Play Again</button>';
+    h += '</div>';
+    mid.innerHTML = h;
+  }
+}
+
+function showStory() {
+  document.getElementById('storyBtn').style.display = 'none';
+  document.getElementById('storyBox').innerHTML = '<div class="story-box">' + idiom.story + '</div>';
+}
+
+function setActive(wIdx) {
+  if (gameState !== "playing") return;
+  if (locked[wIdx]?.some(l => !l)) {
+    activeWord = wIdx;
+    renderMiddle();
+  }
+}
+
+function renderBottom() {
+  const bot = document.getElementById('bottom');
+  if (gameState !== "playing") { bot.innerHTML = ''; return; }
+  let h = '';
+  KB_ROWS.forEach(row => {
+    h += '<div class="kb-row">';
+    row.forEach(key => {
+      const isWide = key === "ENTER" || key === "\u232b";
+      const status = keyColors[key] || "";
+      let cls = "kb-key";
+      if (isWide) cls += " wide";
+      if (status) cls += " " + status;
+      h += '<button class="' + cls + '" data-key="' + key + '">' + key + '</button>';
+    });
+    h += '</div>';
+  });
+  if (guesses.length > 0) {
+    h += '<button class="history-toggle" onclick="toggleHistory()">' +
+      (showHist ? '\u25b2 Hide' : '\u25bc Show') + ' past guesses (' + guesses.length + ')</button>';
+  }
+  bot.innerHTML = h;
+  bot.querySelectorAll('.kb-key').forEach(btn => {
+    btn.addEventListener('click', () => handleKey(btn.dataset.key));
+  });
+}
+
+function handleKey(key) {
+  if (gameState !== "playing") return;
+  if (key === "ENTER") { submitGuess(); return; }
+  if (key === "\u232b" || key === "BACKSPACE") {
+    let delIdx = -1;
+    for (let i = grid[activeWord].length - 1; i >= 0; i--) {
+      if (!locked[activeWord][i] && grid[activeWord][i]) { delIdx = i; break; }
+    }
+    if (delIdx >= 0) {
+      grid[activeWord][delIdx] = "";
+    } else {
+      let prev = activeWord - 1;
+      while (prev >= 0) { if (locked[prev].some(l => !l)) break; prev--; }
+      if (prev >= 0) activeWord = prev;
+    }
+    renderMiddle();
+    return;
+  }
+  if (/^[A-Z]$/i.test(key)) {
+    const c = cursor(activeWord);
+    if (c >= 0) {
+      grid[activeWord][c] = key.toUpperCase();
+      // If word full, advance
+      if (cursor(activeWord) < 0 && activeWord < answerWords.length - 1) {
+        let nw = activeWord + 1;
+        while (nw < answerWords.length) { if (locked[nw].some(l => !l)) break; nw++; }
+        if (nw < answerWords.length) activeWord = nw;
+      }
+    }
+    renderMiddle();
+  }
+}
+
+function submitGuess() {
+  if (gameState !== "playing") return;
+  const filled = grid.every((w, i) => w.length === answerWords[i].length && w.every(l => l));
+  if (!filled) {
+    document.getElementById('middle').classList.add('shake');
+    setTimeout(() => document.getElementById('middle').classList.remove('shake'), 500);
+    return;
+  }
+  const words = grid.map(w => w.join(""));
+  const ev = evaluate(words);
+  guesses.push({ words, evaluation: ev });
+
+  // Update key colours
+  for (let w = 0; w < words.length; w++) {
+    for (let i = 0; i < words[w].length; i++) {
+      const letter = words[w][i], status = ev[w][i];
+      const pri = { correct: 3, present: 2, absent: 1 };
+      if (!keyColors[letter] || pri[status] > pri[keyColors[letter]]) {
+        keyColors[letter] = status;
+      }
+    }
+  }
+
+  const won = words.every((w, i) => w === answerWords[i]);
+  if (won) {
+    gameState = "won";
+  } else if (guesses.length >= MAX) {
+    gameState = "lost";
+  } else {
+    rebuildLocked();
+    grid = makeGrid();
+    activeWord = firstEditable();
+  }
+  renderMiddle();
+  renderBottom();
+  renderHistory();
+}
+
+function toggleHistory() {
+  showHist = !showHist;
+  const bg = document.getElementById('overlayBg');
+  const panel = document.getElementById('historyPanel');
+  if (showHist) { bg.classList.add('show'); panel.classList.add('show'); renderHistory(); }
+  else { bg.classList.remove('show'); panel.classList.remove('show'); }
+  renderBottom();
+}
+
+document.getElementById('overlayBg').addEventListener('click', () => {
+  if (showHist) toggleHistory();
+});
+
+function renderHistory() {
+  const panel = document.getElementById('historyPanel');
+  let h = '<div class="history-title">Past Guesses</div>';
+  guesses.forEach((g, gi) => {
+    h += '<div class="history-guess"><div class="num">#' + (gi + 1) + '</div>';
+    answerWords.forEach((word, wIdx) => {
+      const sz = histTileSize(word.length);
+      const fs = sz < 20 ? 7 : 9;
+      h += '<div class="history-word-row">';
+      word.split("").forEach((_, lIdx) => {
+        const letter = g.words[wIdx]?.[lIdx] || "";
+        const status = g.evaluation[wIdx]?.[lIdx] || "";
+        h += '<div class="htile ' + status + '" style="width:' + sz + 'px;height:' + sz + 'px;font-size:' + fs + 'px">' + letter + '</div>';
+      });
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  panel.innerHTML = h;
+}
+
+// Keyboard input
+document.addEventListener('keydown', function(e) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const key = e.key.toUpperCase();
+  if (key === "ENTER" || key === "BACKSPACE" || /^[A-Z]$/.test(key)) {
+    e.preventDefault();
+    handleKey(key);
+  }
+});
+
+init();
+</script>
+</body>
+</html>
