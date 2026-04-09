@@ -104,7 +104,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 4px 12px;
+      padding: 4px 8px;
       gap: 3px;
       min-height: 0;
       overflow: hidden;
@@ -119,9 +119,12 @@
     }
     .word-row {
       display: flex;
-      gap: 3px;
+      gap: 2px;
       justify-content: center;
       cursor: pointer;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
     }
     .tile {
       display: flex;
@@ -131,7 +134,7 @@
       font-family: 'DM Sans', sans-serif;
       background: white;
       border: 2px solid var(--parchment-deep);
-      border-radius: 6px;
+      border-radius: 5px;
       color: var(--ink);
       transition: all 0.15s ease;
       flex-shrink: 0;
@@ -330,27 +333,41 @@
 
 <script>
 const IDIOMS = [
-  { foreign:"Mi casa es su casa", language:"Spanish", literal:"My house is your house", answer:"MAKE YOURSELF AT HOME", story:"The Spanish phrase reflects the deep tradition of hospitality in Hispanic cultures, where guests are treated like family. The English equivalent 'make yourself at home' similarly invites comfort and ease, though perhaps with a touch less grandeur \u2014 one phrase offers you the whole house, the other just suggests you act like you own it." },
-  { foreign:"Il pleut des cordes", language:"French", literal:"It's raining ropes", answer:"IT IS RAINING CATS AND DOGS", story:"The French imagine heavy rain as thick ropes falling from the sky \u2014 a vivid picture of sheets of water. The English version is even more absurd: 'raining cats and dogs' likely dates to 17th-century London, where heavy storms could wash street debris (sadly, sometimes including dead animals) through the gutters. Both idioms capture that dramatic, torrential downpour." },
-  { foreign:"Tomaten auf den Augen haben", language:"German", literal:"To have tomatoes on your eyes", answer:"TURN A BLIND EYE", story:"Germans picture willful ignorance as having juicy red tomatoes plastered over your eyes \u2014 a wonderfully absurd image. The English 'turn a blind eye' has a more dignified origin: Admiral Nelson allegedly held his telescope to his blind eye at the Battle of Copenhagen to avoid seeing the signal to retreat. Both mean choosing not to see what's plainly there." },
-  { foreign:"Co\u00fbter les yeux de la t\u00eate", language:"French", literal:"To cost the eyes from your head", answer:"IT COSTS AN ARM AND A LEG", story:"The French think something outrageously expensive costs your very eyesight \u2014 your window to the world. English speakers up the ante with an arm AND a leg. The English phrase became popular after World War II, possibly referencing the terrible price soldiers paid. Both idioms agree: some things cost far more than money." },
-  { foreign:"Dar en el clavo", language:"Spanish", literal:"To hit the nail", answer:"HIT THE NAIL ON THE HEAD", story:"The Spanish keep it short and sweet \u2014 just hit the nail. English speakers need to be more specific: you must hit it on the head. Both come from the satisfying precision of carpentry. When you drive a nail perfectly with one clean strike, you've gotten something exactly right. No second swings needed." },
-  { foreign:"Die Daumen dr\u00fccken", language:"German", literal:"To press the thumbs", answer:"KEEP YOUR FINGERS CROSSED", story:"In Germany, you squeeze your thumbs inside your fists for luck \u2014 a gesture dating back to Roman gladiatorial combat, where spectators would tuck their thumbs to wish a fighter well. English speakers cross their fingers instead, a gesture with Christian origins representing the sign of the cross. Different digits, same desperate hope." },
-  { foreign:"Avoir le cafard", language:"French", literal:"To have the cockroach", answer:"FEELING DOWN IN THE DUMPS", story:"Leave it to the French to describe sadness as having a cockroach \u2014 that persistent, unwelcome creature scuttling around inside you. Charles Baudelaire popularised this usage in his poetry. The English 'down in the dumps' is less creepy but equally evocative, with 'dumps' likely from the Dutch 'damp' meaning haze or mist \u2014 a fog of melancholy." },
-  { foreign:"In bocca al lupo", language:"Italian", literal:"Into the mouth of the wolf", answer:"BREAK A LEG", story:"Italians wish you luck by throwing you into a wolf's jaws \u2014 the correct response is 'Crepi il lupo!' (May the wolf die!). English theatre folk tell performers to 'break a leg,' possibly because wishing good luck was considered bad luck, or from the old meaning of 'break' as 'to bend' \u2014 taking a bow. Both traditions agree: the best wishes come in dark disguises." }
+  {
+    foreign:"Nasceu com o cu virado pra lua",
+    language:"Brazilian Portuguese",
+    literal:"Was born with their ass facing the moon",
+    answer:"EVERYTHING THEY TOUCH TURNS TO GOLD",
+    story:"This Brazilian Portuguese expression is a cheeky, vulgar way of saying someone is absurdly lucky — the kind of person life seems to favor without effort. The English answer here, 'everything they touch turns to gold,' leans a little more toward effortless success than luck alone, but the spirit is close: some people seem blessed, and fortune follows them around."
+  },
+  { foreign:"Mi casa es su casa", language:"Spanish", literal:"My house is your house", answer:"MAKE YOURSELF AT HOME", story:"The Spanish phrase reflects the deep tradition of hospitality in Hispanic cultures, where guests are treated like family. The English equivalent 'make yourself at home' similarly invites comfort and ease, though perhaps with a touch less grandeur — one phrase offers you the whole house, the other just suggests you act like you own it." },
+  { foreign:"Il pleut des cordes", language:"French", literal:"It's raining ropes", answer:"IT IS RAINING CATS AND DOGS", story:"The French imagine heavy rain as thick ropes falling from the sky — a vivid picture of sheets of water. The English version is even more absurd: 'raining cats and dogs' likely dates to 17th-century London, where heavy storms could wash street debris (sadly, sometimes including dead animals) through the gutters. Both idioms capture that dramatic, torrential downpour." },
+  { foreign:"Tomaten auf den Augen haben", language:"German", literal:"To have tomatoes on your eyes", answer:"TURN A BLIND EYE", story:"Germans picture willful ignorance as having juicy red tomatoes plastered over your eyes — a wonderfully absurd image. The English 'turn a blind eye' has a more dignified origin: Admiral Nelson allegedly held his telescope to his blind eye at the Battle of Copenhagen to avoid seeing the signal to retreat. Both mean choosing not to see what's plainly there." },
+  { foreign:"Coûter les yeux de la tête", language:"French", literal:"To cost the eyes from your head", answer:"IT COSTS AN ARM AND A LEG", story:"The French think something outrageously expensive costs your very eyesight — your window to the world. English speakers up the ante with an arm AND a leg. The English phrase became popular after World War II, possibly referencing the terrible price soldiers paid. Both idioms agree: some things cost far more than money." },
+  { foreign:"Dar en el clavo", language:"Spanish", literal:"To hit the nail", answer:"HIT THE NAIL ON THE HEAD", story:"The Spanish keep it short and sweet — just hit the nail. English speakers need to be more specific: you must hit it on the head. Both come from the satisfying precision of carpentry. When you drive a nail perfectly with one clean strike, you've gotten something exactly right. No second swings needed." },
+  { foreign:"Die Daumen drücken", language:"German", literal:"To press the thumbs", answer:"KEEP YOUR FINGERS CROSSED", story:"In Germany, you squeeze your thumbs inside your fists for luck — a gesture dating back to Roman gladiatorial combat, where spectators would tuck their thumbs to wish a fighter well. English speakers cross their fingers instead, a gesture with Christian origins representing the sign of the cross. Different digits, same desperate hope." },
+  { foreign:"Avoir le cafard", language:"French", literal:"To have the cockroach", answer:"FEELING DOWN IN THE DUMPS", story:"Leave it to the French to describe sadness as having a cockroach — that persistent, unwelcome creature scuttling around inside you. Charles Baudelaire popularised this usage in his poetry. The English 'down in the dumps' is less creepy but equally evocative, with 'dumps' likely from the Dutch 'damp' meaning haze or mist — a fog of melancholy." },
+  { foreign:"In bocca al lupo", language:"Italian", literal:"Into the mouth of the wolf", answer:"BREAK A LEG", story:"Italians wish you luck by throwing you into a wolf's jaws — the correct response is 'Crepi il lupo!' (May the wolf die!). English theatre folk tell performers to 'break a leg,' possibly because wishing good luck was considered bad luck, or from the old meaning of 'break' as 'to bend' — taking a bow. Both traditions agree: the best wishes come in dark disguises." }
 ];
 
 const KB_ROWS = [
   ["Q","W","E","R","T","Y","U","I","O","P"],
   ["A","S","D","F","G","H","J","K","L"],
-  ["ENTER","Z","X","C","V","B","N","M","\u232b"]
+  ["ENTER","Z","X","C","V","B","N","M","⌫"]
 ];
 const MAX = 6;
 
 let idiom, answerWords, guesses, grid, locked, activeWord, gameState, keyColors, showHist;
+let hasPlayedFirstRound = false;
 
 function init() {
-  idiom = IDIOMS[Math.floor(Math.random() * IDIOMS.length)];
+  if (!hasPlayedFirstRound) {
+    idiom = IDIOMS[0];
+    hasPlayedFirstRound = true;
+  } else {
+    idiom = IDIOMS[Math.floor(Math.random() * IDIOMS.length)];
+  }
+
   answerWords = idiom.answer.split(" ");
   guesses = [];
   locked = answerWords.map(w => new Array(w.length).fill(null));
@@ -384,15 +401,26 @@ function rebuildLocked() {
 function evaluate(guessWords) {
   const result = [];
   for (let w = 0; w < answerWords.length; w++) {
-    const gW = (guessWords[w]||"").toUpperCase(), aW = answerWords[w];
+    const gW = (guessWords[w] || "").toUpperCase(), aW = answerWords[w];
     const wr = [], used = new Array(aW.length).fill(false);
+
     for (let i = 0; i < aW.length; i++) {
-      if (gW[i] === aW[i]) { wr[i] = "correct"; used[i] = true; } else wr[i] = "absent";
+      if (gW[i] === aW[i]) {
+        wr[i] = "correct";
+        used[i] = true;
+      } else {
+        wr[i] = "absent";
+      }
     }
+
     for (let i = 0; i < aW.length; i++) {
       if (wr[i] === "correct") continue;
       for (let j = 0; j < aW.length; j++) {
-        if (!used[j] && gW[i] === aW[j]) { wr[i] = "present"; used[j] = true; break; }
+        if (!used[j] && gW[i] === aW[j]) {
+          wr[i] = "present";
+          used[j] = true;
+          break;
+        }
       }
     }
     result.push(wr);
@@ -408,31 +436,51 @@ function cursor(wIdx) {
 }
 
 function firstEditable() {
-  for (let w = 0; w < locked.length; w++) { if (locked[w].some(l => !l)) return w; }
+  for (let w = 0; w < locked.length; w++) {
+    if (locked[w].some(l => !l)) return w;
+  }
   return 0;
 }
 
-function tileSize(wordLen) { return Math.max(26, Math.min(36, Math.floor(300 / wordLen))); }
-function histTileSize(wordLen) { return Math.max(16, Math.min(22, Math.floor(240 / wordLen))); }
+function tileMetrics(wordLen) {
+  const vw = Math.min(window.innerWidth || 390, 430);
+  const available = Math.max(220, vw - 24);
+  const gap = 2;
+  const raw = Math.floor((available - gap * (wordLen - 1)) / wordLen);
+  const size = Math.max(18, Math.min(34, raw));
+  const font = size >= 30 ? 13 : size >= 26 ? 12 : size >= 22 ? 10 : 9;
+  return { size, font };
+}
+
+function histTileMetrics(wordLen) {
+  const vw = Math.min(window.innerWidth || 390, 430);
+  const available = Math.max(180, vw - 70);
+  const gap = 2;
+  const raw = Math.floor((available - gap * (wordLen - 1)) / wordLen);
+  const size = Math.max(12, Math.min(20, raw));
+  const font = size >= 18 ? 9 : size >= 15 ? 8 : 7;
+  return { size, font };
+}
 
 // ---- Render ----
 function renderTop() {
   document.getElementById('langBadge').textContent = idiom.language;
-  document.getElementById('foreignText').innerHTML = '\u201c' + idiom.foreign + '\u201d';
+  document.getElementById('foreignText').innerHTML = '“' + idiom.foreign + '”';
   document.getElementById('hintArea').innerHTML = '<button class="hint-btn" onclick="showHint()">Show Hint</button>';
 }
 
 function showHint() {
-  document.getElementById('hintArea').innerHTML = '<div class="hint-text">Literally: \u201c' + idiom.literal + '\u201d</div>';
+  document.getElementById('hintArea').innerHTML = '<div class="hint-text">Literally: “' + idiom.literal + '”</div>';
 }
 
 function renderMiddle() {
   const mid = document.getElementById('middle');
+
   if (gameState === "playing") {
     let h = '<div class="guess-label">Guess ' + (guesses.length + 1) + ' of ' + MAX + '</div>';
+
     answerWords.forEach((word, wIdx) => {
-      const sz = tileSize(word.length);
-      const fs = sz < 30 ? 10 : 13;
+      const { size, font } = tileMetrics(word.length);
       h += '<div class="word-row" onclick="setActive(' + wIdx + ')">';
       word.split("").forEach((_, lIdx) => {
         const letter = grid[wIdx]?.[lIdx] || "";
@@ -442,10 +490,12 @@ function renderMiddle() {
         if (isLock) cls += " locked";
         else if (isAct && letter) cls += " active filled";
         else if (isAct) cls += " active";
-        h += '<div class="' + cls + '" style="width:' + sz + 'px;height:' + sz + 'px;font-size:' + fs + 'px">' + letter + '</div>';
+
+        h += '<div class="' + cls + '" style="width:' + size + 'px;height:' + size + 'px;font-size:' + font + 'px">' + letter + '</div>';
       });
       h += '</div>';
     });
+
     mid.innerHTML = h;
   } else {
     let h = '<div class="game-over">';
@@ -478,12 +528,16 @@ function setActive(wIdx) {
 
 function renderBottom() {
   const bot = document.getElementById('bottom');
-  if (gameState !== "playing") { bot.innerHTML = ''; return; }
+  if (gameState !== "playing") {
+    bot.innerHTML = '';
+    return;
+  }
+
   let h = '';
   KB_ROWS.forEach(row => {
     h += '<div class="kb-row">';
     row.forEach(key => {
-      const isWide = key === "ENTER" || key === "\u232b";
+      const isWide = key === "ENTER" || key === "⌫";
       const status = keyColors[key] || "";
       let cls = "kb-key";
       if (isWide) cls += " wide";
@@ -492,10 +546,12 @@ function renderBottom() {
     });
     h += '</div>';
   });
+
   if (guesses.length > 0) {
     h += '<button class="history-toggle" onclick="toggleHistory()">' +
-      (showHist ? '\u25b2 Hide' : '\u25bc Show') + ' past guesses (' + guesses.length + ')</button>';
+      (showHist ? '▲ Hide' : '▼ Show') + ' past guesses (' + guesses.length + ')</button>';
   }
+
   bot.innerHTML = h;
   bot.querySelectorAll('.kb-key').forEach(btn => {
     btn.addEventListener('click', () => handleKey(btn.dataset.key));
@@ -504,30 +560,47 @@ function renderBottom() {
 
 function handleKey(key) {
   if (gameState !== "playing") return;
-  if (key === "ENTER") { submitGuess(); return; }
-  if (key === "\u232b" || key === "BACKSPACE") {
+
+  if (key === "ENTER") {
+    submitGuess();
+    return;
+  }
+
+  if (key === "⌫" || key === "BACKSPACE") {
     let delIdx = -1;
     for (let i = grid[activeWord].length - 1; i >= 0; i--) {
-      if (!locked[activeWord][i] && grid[activeWord][i]) { delIdx = i; break; }
+      if (!locked[activeWord][i] && grid[activeWord][i]) {
+        delIdx = i;
+        break;
+      }
     }
+
     if (delIdx >= 0) {
       grid[activeWord][delIdx] = "";
     } else {
       let prev = activeWord - 1;
-      while (prev >= 0) { if (locked[prev].some(l => !l)) break; prev--; }
+      while (prev >= 0) {
+        if (locked[prev].some(l => !l)) break;
+        prev--;
+      }
       if (prev >= 0) activeWord = prev;
     }
+
     renderMiddle();
     return;
   }
+
   if (/^[A-Z]$/i.test(key)) {
     const c = cursor(activeWord);
     if (c >= 0) {
       grid[activeWord][c] = key.toUpperCase();
-      // If word full, advance
+
       if (cursor(activeWord) < 0 && activeWord < answerWords.length - 1) {
         let nw = activeWord + 1;
-        while (nw < answerWords.length) { if (locked[nw].some(l => !l)) break; nw++; }
+        while (nw < answerWords.length) {
+          if (locked[nw].some(l => !l)) break;
+          nw++;
+        }
         if (nw < answerWords.length) activeWord = nw;
       }
     }
@@ -537,20 +610,22 @@ function handleKey(key) {
 
 function submitGuess() {
   if (gameState !== "playing") return;
+
   const filled = grid.every((w, i) => w.length === answerWords[i].length && w.every(l => l));
   if (!filled) {
     document.getElementById('middle').classList.add('shake');
     setTimeout(() => document.getElementById('middle').classList.remove('shake'), 500);
     return;
   }
+
   const words = grid.map(w => w.join(""));
   const ev = evaluate(words);
   guesses.push({ words, evaluation: ev });
 
-  // Update key colours
   for (let w = 0; w < words.length; w++) {
     for (let i = 0; i < words[w].length; i++) {
-      const letter = words[w][i], status = ev[w][i];
+      const letter = words[w][i];
+      const status = ev[w][i];
       const pri = { correct: 3, present: 2, absent: 1 };
       if (!keyColors[letter] || pri[status] > pri[keyColors[letter]]) {
         keyColors[letter] = status;
@@ -559,6 +634,7 @@ function submitGuess() {
   }
 
   const won = words.every((w, i) => w === answerWords[i]);
+
   if (won) {
     gameState = "won";
   } else if (guesses.length >= MAX) {
@@ -568,6 +644,7 @@ function submitGuess() {
     grid = makeGrid();
     activeWord = firstEditable();
   }
+
   renderMiddle();
   renderBottom();
   renderHistory();
@@ -577,8 +654,16 @@ function toggleHistory() {
   showHist = !showHist;
   const bg = document.getElementById('overlayBg');
   const panel = document.getElementById('historyPanel');
-  if (showHist) { bg.classList.add('show'); panel.classList.add('show'); renderHistory(); }
-  else { bg.classList.remove('show'); panel.classList.remove('show'); }
+
+  if (showHist) {
+    bg.classList.add('show');
+    panel.classList.add('show');
+    renderHistory();
+  } else {
+    bg.classList.remove('show');
+    panel.classList.remove('show');
+  }
+
   renderBottom();
 }
 
@@ -589,25 +674,27 @@ document.getElementById('overlayBg').addEventListener('click', () => {
 function renderHistory() {
   const panel = document.getElementById('historyPanel');
   let h = '<div class="history-title">Past Guesses</div>';
+
   guesses.forEach((g, gi) => {
     h += '<div class="history-guess"><div class="num">#' + (gi + 1) + '</div>';
+
     answerWords.forEach((word, wIdx) => {
-      const sz = histTileSize(word.length);
-      const fs = sz < 20 ? 7 : 9;
+      const { size, font } = histTileMetrics(word.length);
       h += '<div class="history-word-row">';
       word.split("").forEach((_, lIdx) => {
         const letter = g.words[wIdx]?.[lIdx] || "";
         const status = g.evaluation[wIdx]?.[lIdx] || "";
-        h += '<div class="htile ' + status + '" style="width:' + sz + 'px;height:' + sz + 'px;font-size:' + fs + 'px">' + letter + '</div>';
+        h += '<div class="htile ' + status + '" style="width:' + size + 'px;height:' + size + 'px;font-size:' + font + 'px">' + letter + '</div>';
       });
       h += '</div>';
     });
+
     h += '</div>';
   });
+
   panel.innerHTML = h;
 }
 
-// Keyboard input
 document.addEventListener('keydown', function(e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const key = e.key.toUpperCase();
@@ -615,6 +702,11 @@ document.addEventListener('keydown', function(e) {
     e.preventDefault();
     handleKey(key);
   }
+});
+
+window.addEventListener('resize', () => {
+  renderMiddle();
+  if (showHist) renderHistory();
 });
 
 init();
